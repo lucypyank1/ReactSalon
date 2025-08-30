@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { getAppointments, createAppointment, updateAppointment } from '../api/appointments';
+import { getAppointments, createAppointment, updateAppointment, deleteAppointment } from '../api/appointments';
 
 export default function AppointmentsList() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Состояние формы
   const [formData, setFormData] = useState({
-    appointmentId: null, // <-- для редактирования
+    appointmentId: null,
     clientId: '',
     masterId: '',
     serviceId: '',
@@ -35,23 +34,18 @@ export default function AppointmentsList() {
     loadAppointments();
   }, []);
 
-  // Изменение полей формы
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
-  // Отправка формы
   async function handleSubmit(e) {
     e.preventDefault();
     try {
       if (formData.appointmentId) {
-        // ===== КОД ДЛЯ РЕДАКТИРОВАНИЯ =====
         await updateAppointment(formData.appointmentId, formData);
-        // ==================================
       } else {
         await createAppointment(formData);
       }
-      // Очистка формы и обновление списка
       setFormData({
         appointmentId: null,
         clientId: '',
@@ -69,7 +63,19 @@ export default function AppointmentsList() {
 
   // ===== КОД ДЛЯ РЕДАКТИРОВАНИЯ =====
   function handleEdit(appointment) {
-    setFormData(appointment); // заполняем форму данными для редактирования
+    setFormData(appointment);
+  }
+  // ==================================
+
+  // ===== КОД ДЛЯ УДАЛЕНИЯ =====
+  async function handleDelete(id) {
+    if (!window.confirm('Вы уверены, что хотите удалить эту запись?')) return;
+    try {
+      await deleteAppointment(id);
+      loadAppointments(); // обновляем список после удаления
+    } catch (err) {
+      setError(err.message);
+    }
   }
   // ==================================
 
@@ -130,7 +136,8 @@ export default function AppointmentsList() {
           {appointments.map(a => (
             <li key={a.appointmentId}>
               ID: {a.appointmentId}, Время: {a.appointmentTime}, Статус: {a.status || 'не указан'}
-              <button onClick={() => handleEdit(a)}>Редактировать</button> {/* кнопка редактирования */}
+              <button onClick={() => handleEdit(a)}>Редактировать</button>
+              <button onClick={() => handleDelete(a.appointmentId)} style={{ marginLeft: '10px', color: 'red' }}>Удалить</button>
             </li>
           ))}
         </ul>
