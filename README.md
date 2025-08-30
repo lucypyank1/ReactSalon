@@ -78,3 +78,5 @@ npm run dev
 > * В `api/appointments.js` измените `API_URL` на адрес своего сервера.
 > * В форме `AppointmentsList.jsx` проверьте названия полей (`clientId`, `masterId`, `serviceId`, `appointmentTime`, `status`) и при необходимости добавьте новые.
 > * Кнопки редактирования и удаления используют функции из `api/appointments.js`, убедитесь, что они импортированы.
+> ## Удачи!
+
